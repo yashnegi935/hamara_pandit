@@ -45,20 +45,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'GemGuide AI API is running smoothly' });
 });
 
-// Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/')) {
-      return next();
-    }
-    res.sendFile(path.resolve(__dirname, '../client', 'dist', 'index.html'));
-  });
-} else {
-  app.get('/', (req, res) => {
-    res.send('GemGuide AI API is running in development mode.');
-  });
-}
+// Serve frontend
+// In both development and production, serve the built React SPA.
+// This ensures SPA routes (e.g. /dashboard) work with refresh.
+const distPath = path.join(__dirname, '../client/dist');
+
+app.use(express.static(distPath));
+
+app.get('*', (req, res) => {
+  // Let API routes through (defensive; API routes are already registered first).
+  if (req.path.startsWith('/api/')) return res.status(404).end();
+  res.sendFile(path.join(distPath, 'index.html'));
+});
 
 // Error Handling Middleware
 app.use(notFound);
