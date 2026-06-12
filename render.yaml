@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: gemguide-ai
+    env: node
+    buildCommand: npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ASTROLOGY_API_KEY
+        sync: false
