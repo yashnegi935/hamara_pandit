@@ -45,16 +45,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'GemGuide AI API is running smoothly' });
 });
 
-// Serve frontend
-// In both development and production, serve the built React SPA.
-// This ensures SPA routes (e.g. /dashboard) work with refresh.
-const distPath = path.join(__dirname, '../client/dist');
+// Serve frontend React SPA
+const distPath = path.resolve(__dirname, '../client/dist');
 
+// Serve static assets from the React build directory
 app.use(express.static(distPath));
 
+// Fallback for Single Page Application (SPA) routing
 app.get('*', (req, res) => {
-  // Let API routes through (defensive; API routes are already registered first).
-  if (req.path.startsWith('/api/')) return res.status(404).end();
+  // Prevent API requests from falling back to index.html
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ message: 'API endpoint not found' });
+  }
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
